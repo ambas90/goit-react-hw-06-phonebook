@@ -1,32 +1,33 @@
-import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
-import ContactForm from './ContactForm';
-import Filter from './Filter';
-import ContactList from './ContactList';
-
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, deleteContact, setFilter } from '../../redux/reducers';
+import ContactForm from '../contactForm/ContactForm';
+import Filter from '../filter/Filter';
+import ContactList from '../contactList/ContactList';
 import { AppContainer, AppWrapper } from './AppStyles';
 
 export default function App() {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
+  const contacts = useSelector(state => state.phonebook.contacts);
+  const filter = useSelector(state => state.phonebook.filter);
+  const dispatch = useDispatch();
 
-  const addContact = ({ name, number }) => {
+  const handleAddContact = ({ name, number }) => {
     const checkContactExist = contacts.some(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
     if (checkContactExist) {
       alert(`${name} is already in contacts`);
     } else {
-      setContacts(prev => [...prev, { name, number, id: nanoid() }]);
+      dispatch(addContact({ name, number }));
     }
   };
 
-  const deleteContact = contactId => {
-    setContacts(prev => prev.filter(contact => contact.id !== contactId));
+  const HandleDeleteContact = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
   const handleChangeFilter = evt => {
-    setFilter(evt.target.value);
+    dispatch(setFilter(evt.target.value));
   };
 
   const getFilteredContacts = () => {
@@ -41,9 +42,10 @@ export default function App() {
 
   const loadContacts = () => {
     const savedContacts = JSON.parse(localStorage.getItem('contacts'));
-    console.log(savedContacts);
     if (savedContacts.length > 0) {
-      setContacts(savedContacts);
+      savedContacts.forEach(contact => {
+        dispatch(addContact({ name: contact.name, number: contact.number }));
+      });
     }
   };
 
@@ -55,12 +57,12 @@ export default function App() {
     <AppContainer>
       <AppWrapper>
         <h1>Phonebook</h1>
-        <ContactForm onSubmit={addContact} />
+        <ContactForm onSubmit={handleAddContact} />
         <h2>Contacts</h2>
         <Filter value={filter} onChange={handleChangeFilter} />
         <ContactList
           contacts={getFilteredContacts()}
-          onDeleteContact={deleteContact}
+          onDeleteContact={HandleDeleteContact}
         />
       </AppWrapper>
     </AppContainer>
