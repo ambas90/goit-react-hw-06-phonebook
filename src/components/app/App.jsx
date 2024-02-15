@@ -49,7 +49,7 @@ export default function App() {
     }
   };
 
-  useEffect(loadContacts, []);
+  useEffect(loadContacts, [dispatch]);
 
   useEffect(saveContacts, [contacts]);
 
