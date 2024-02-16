@@ -42,7 +42,7 @@ export default function App() {
 
   const loadContacts = () => {
     const savedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (savedContacts.length > 0) {
+    if (savedContacts) {
       savedContacts.forEach(contact => {
         dispatch(addContact({ name: contact.name, number: contact.number }));
       });
